@@ -22,6 +22,23 @@
                 return false;
             }
         }
+
+        static function CreateUser($name, $pass, $image)
+        {
+            if ($name == "" || $pass == "")
+            {
+                echo "<h1>Error !!!</h1>";
+                return false;
+            }
+            if (strlen($name) < 3 || strlen($pass) < 3)
+            {
+                echo "<h1>Error, pass and name must > 3</h1>";
+                return false;
+            }
+            $obj = new Customers($name, $pass, 0, 0, $image);
+            $obj->intoDB();
+            return true;
+        }
     }
 
     class Customers
@@ -80,6 +97,148 @@
                 echo 'Error ' . $ex->getMessage();
                 return false;
             }
+        }
+    }
+
+    class Item
+    {
+        public $id;
+        public $item_name;
+        public $cat_id;
+        public $price_in;
+        public $price_sale;
+        public $info;
+        public $rate;
+        public $image_path;
+        public $action;
+
+        function __construct($item_name, $cat_id, $price_in, $price_sale, $info, $image_path, $rate = 0, $action = 0, $id = 0)
+        {
+            $this->item_name = $item_name;
+            $this->cat_id = $cat_id;
+            $this->price_in = $price_in;
+            $this->price_sale = $price_sale;
+            $this->info = $info;
+            $this->image_path = $image_path;
+            $this->rate = $rate;
+            $this->action = $action;
+            $this->id = $id;
+        }
+
+        function Add()
+        {
+            try
+            {
+                $pdo = Tools::Connect();
+                $select = $pdo->prepare("
+                insert into items (item_name, cat_id, price_in, price_sale, info, image_path, rate, action)
+                values (:item_name, :cat_id, :price_in, :price_sale, :info, :image_path, :rate, :action);
+                ");
+                $ar = (array)$this;
+                array_shift($ar);
+                $select->execute($ar);
+            }
+            catch (PDOException $ex)
+            {
+                echo "Some error..." . $ex->getMessage();
+                return false;
+            }
+        }
+
+        static function Show($id)
+        {
+            $item = null;
+            try
+            {
+                $pdo = Tools::Connect();
+
+                $ps = $pdo->prepare("select * from items where id=?");
+                $ps->execute(array($id));
+                $row = $ps->fetch();
+                $item = new Item($row['$item_name'], $row['$cat_id'], $row['$price_in'], $row['$price_sale'],
+                    $row['$info'], $row['image_path'], $row['rate'], $row['action'], $row['$id']);
+                return $item;
+            }
+            catch (PDOException $ex)
+            {
+                echo "Error!!! " . $ex->getMessage();
+                return false;
+            }
+        }
+
+        function GetItems($cat_id = 0)
+        {
+            $items = nill;
+            try
+            {
+                $pdo = Tools::Connect();
+                if ($cat_id == 0)
+                {
+                    $select = $pdo->prepare("select * from item;");
+                    $select->execute();
+                } else
+                {
+                    $select = $pdo->prepare("select * from items where cat_id=?");
+                    $select->execute(array($cat_id));
+                }
+                while ($row = $select->fetch())
+                {
+                    /*
+                    $item = new Item($row['item_name'], $row['cat_id'], $row['price_in'],
+                        $row['price_sale'], $row['info'], $row['image_path'], $row['rate'], $row['action'], $row['id']);
+                    */
+                    $item = Item::Show($row['id']);
+                    $items[] = $item;
+                }
+                return $items;
+            }
+            catch (PDOException $ex)
+            {
+                echo "Error!!! " . $ex->getMessage();
+                return false;
+            }
+        }
+
+        function Draw()
+        {
+            echo "<div class='col-sm-2 col-md-2 col-lg-2 container' style='height:350px;margin:2px;'>";
+            //itemInfo.php contains detailed info about product
+            echo "<div class='row' style='margin-top:2px; background-color:#ffd2aa;'>";
+            echo "<a href='pages/itemInfo.php?name=" . $this->id . "'class='pull-left' style='margin-left:10px;''target='_blank'>";
+            echo $this->item_name;
+            echo "</a>";
+            echo "<span class='pull-right' style='margin-right:10px;'>";
+            echo $this->rate . "&nbsp;rate";
+            echo "</span>";
+            echo "</div>";
+            echo "<div style='height:100px; margin-top:2px;' class='row'>";
+            echo "<img src='" . $this->image_path . " 'height='100px'  />";
+            echo "<span class='pull-right' style='marginleft:10px; color:red; font-size:16pt;'>";
+            echo "$&nbsp;" . $this->price_sale;
+            echo "</span>";
+            echo "</div>";
+            echo "<div class='row' style='margintop:10px;'>";
+            echo "<p class='text-left col-xs-12' style='background-color:lightblue; overflow:auto; height:60px;'>";
+            echo $this->info;
+            echo "</p>";
+            echo "</div>";
+            // echo "<div class='row' style='margintop:2px;'>";
+            // echo "</div>";
+            echo "<div class='row' style='margintop:2px;'>";
+            //creating cookies for the cart
+            //will be explained later
+            $ruser = '';
+            if (!isset($_SESSION['reg']) || $_SESSION['reg'] == "")
+            {
+                $ruser = "cart_" . $this->id;
+            } else
+            {
+                $ruser = $_SESSION['reg'] . "_" . $this->id;
+            }
+            echo "<button class='btn btn-success col-xsoffset-12 col-xs-12' 
+            onclick=createCookie('" . $ruser . "','" . $this->id . "')>Add To My Cart</button>";
+            echo "</div>";
+            echo "</div>";
         }
     }
 
