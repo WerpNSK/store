@@ -147,7 +147,7 @@
 
         static function Show($id)
         {
-            $item = null;
+            $item1 = null;
             try
             {
                 $pdo = Tools::Connect();
@@ -155,8 +155,7 @@
                 $ps = $pdo->prepare("select * from items where id=?");
                 $ps->execute(array($id));
                 $row = $ps->fetch();
-                $item = new Item($row['$item_name'], $row['$cat_id'], $row['$price_in'], $row['$price_sale'],
-                    $row['$info'], $row['image_path'], $row['rate'], $row['action'], $row['$id']);
+                $item = new Item($row['item_name'], $row['cat_id'], $row['price_in'], $row['price_sale'], $row['info'], $row['image_path'], $row['rate'], $row['action'], $row['id']);
                 return $item;
             }
             catch (PDOException $ex)
@@ -166,15 +165,15 @@
             }
         }
 
-        function GetItems($cat_id = 0)
+        static function GetItems($cat_id = 0)
         {
-            $items = nill;
+            $items = null;
             try
             {
                 $pdo = Tools::Connect();
                 if ($cat_id == 0)
                 {
-                    $select = $pdo->prepare("select * from item;");
+                    $select = $pdo->prepare("select * from items;");
                     $select->execute();
                 } else
                 {
@@ -201,7 +200,7 @@
 
         function Draw()
         {
-            echo "<div class='col-sm-2 col-md-2 col-lg-2 container' style='height:350px;margin:2px;'>";
+            echo "<div class='col-3 container' style='height:350px;margin:2px;'>";
             //itemInfo.php contains detailed info about product
             echo "<div class='row' style='margin-top:2px; background-color:#ffd2aa;'>";
             echo "<a href='pages/itemInfo.php?name=" . $this->id . "'class='pull-left' style='margin-left:10px;''target='_blank'>";
@@ -213,18 +212,16 @@
             echo "</div>";
             echo "<div style='height:100px; margin-top:2px;' class='row'>";
             echo "<img src='" . $this->image_path . " 'height='100px'  />";
-            echo "<span class='pull-right' style='marginleft:10px; color:red; font-size:16pt;'>";
+            echo "<span class='pull-right' style='margin-left:10px; color:red; font-size:16pt;'>";
             echo "$&nbsp;" . $this->price_sale;
             echo "</span>";
             echo "</div>";
-            echo "<div class='row' style='margintop:10px;'>";
+            echo "<div class='row' style='margin-top:30px;'>";
             echo "<p class='text-left col-xs-12' style='background-color:lightblue; overflow:auto; height:60px;'>";
             echo $this->info;
             echo "</p>";
             echo "</div>";
-            // echo "<div class='row' style='margintop:2px;'>";
-            // echo "</div>";
-            echo "<div class='row' style='margintop:2px;'>";
+            echo "<div class='row' style='margin-top:2px;'>";
             //creating cookies for the cart
             //will be explained later
             $ruser = '';
@@ -238,6 +235,26 @@
             echo "<button class='btn btn-success col-xsoffset-12 col-xs-12' 
             onclick=createCookie('" . $ruser . "','" . $this->id . "')>Add To My Cart</button>";
             echo "</div>";
+            echo "</div>";
+        }
+
+        function DrawForCart()
+        {
+            echo "<div calss='row' style='margin:2px;'>";
+            echo '<img src="'.$this->image_path.'" width="100" height="100" class="col-2">';
+            echo "<span style='margin-right:10px; backgroud-color:#ddeeaa; color:blue; font-size:16pt' class='col-3'>";
+            echo "&#8381&nbsp;".$this->price_sale;
+            echo "</span>";
+            $ruser="";
+            if (!isset($_SESSION['reg']) || $_SESSION['reg']=="")
+            {
+                $ruser="cat_".$this->id;
+            }
+            else
+            {
+                $ruser = $_SESSION['reg']."_".$this->id;
+            }
+            echo "<button class='col-1 btn btn-danger' style='margin-left:10px;' onclick=eraseCookie('".$ruser."')>x</button>";
             echo "</div>";
         }
     }

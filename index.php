@@ -39,6 +39,8 @@
                     $page = $_GET['pages'];
                     if ($page == 1) include_once('pages/registration.php');
                     if ($page == 2) include_once ('pages/admin.php');
+                    if ($page == 3) include_once ('pages/category.php');
+                    if ($page == 4) include_once ('pages/category.php');
                 }
                 /*
                 $pages = $_GET['pages'];
