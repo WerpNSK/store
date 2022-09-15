@@ -155,8 +155,9 @@
                 $ps = $pdo->prepare("select * from items where id=?");
                 $ps->execute(array($id));
                 $row = $ps->fetch();
-                $item = new Item($row['item_name'], $row['cat_id'], $row['price_in'], $row['price_sale'], $row['info'], $row['image_path'], $row['rate'], $row['action'], $row['id']);
-                return $item;
+                $item1 = new Item($row['item_name'], $row['cat_id'], $row['price_in'],
+                    $row['price_sale'], $row['info'], $row['image_path'], $row['rate'], $row['action'], $row['id']);
+                return $item1;
             }
             catch (PDOException $ex)
             {
@@ -241,23 +242,27 @@
         function DrawForCart()
         {
             echo "<div calss='row' style='margin:2px;'>";
-            echo '<img src="'.$this->image_path.'" width="100" height="100" class="col-2">';
+            echo '<img src="' . $this->image_path . '" width="100" height="100" class="col-2">';
             echo "<span style='margin-right:10px; backgroud-color:#ddeeaa; color:blue; font-size:16pt' class='col-3'>";
-            echo "&#8381&nbsp;".$this->price_sale;
+            echo "&#8381&nbsp;" . $this->price_sale;
             echo "</span>";
-            $ruser="";
-            if (!isset($_SESSION['reg']) || $_SESSION['reg']=="")
+            $ruser = "";
+            if (!isset($_SESSION['reg']) || $_SESSION['reg'] == "")
             {
-                $ruser="cat_".$this->id;
-            }
-            else
+                $ruser = "cart_" . $this->id;
+            } else
             {
-                $ruser = $_SESSION['reg']."_".$this->id;
+                $ruser = $_SESSION['reg'] . "_" . $this->id;
             }
-            echo "<button class='col-1 btn btn-danger' style='margin-left:10px;' onclick=eraseCookie('".$ruser."')>x</button>";
+            echo "<button class='col-1 btn btn-danger' style='margin-left:10px;' onclick=eraseCookie('" . $ruser . "');>x</button>";
             echo "</div>";
         }
-    }
 
+
+        function Sale()
+        {
+
+        }
+    }
 
 ?>

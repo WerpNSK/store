@@ -22,7 +22,7 @@
         {
             $item->Draw();
         }
-        echo '</div>'
+        echo '</div>';
     ?>
 </form>
 
@@ -37,21 +37,21 @@
         else {
             ajaxObj = new ActiveXObject('Microsoft.XMLHTTP');
         }
-        ajaxObj.onreadystatechange = function () {
+        ajaxObj.onreadystatechange = function ()
+        {
             if (ajaxObj.readyState == 4 && ajaxObj.status == 200) {
                 document.getElementById('result').innerHTML = ajaxObj.responseText;
             }
         }
 
         //preparing post AJAX request
-        ajaxObj.open('post', 'post/lists.php', true);
-        ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        ajaxObj.open('POST', "pages/lists.php", true);
+        ajaxObj.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         ajaxObj.send("cat=" + cat);
     }
 
-    function createCookie(uname, id)
-    {
-        let date = new Date(new Date().getTime()+60*1000*30);
-        document.cookie = uname+"="+id"; path=/;expires=" + date.toUTCString();
+    function createCookie(uname, id) {
+        let date = new Date(new Date().getTime() + 60 * 1000 * 30);
+        document.cookie = uname + "=" + id+"; path=/;expires=" + date.toUTCString();
     }
 </script>
