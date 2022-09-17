@@ -78,14 +78,12 @@
 
     function eraseCookie(uname)
     {
-        alert("123")
         let theCookies = document.cookie.split(';');
         for (let i = 1; i<= theCookies.length; i++)
         {
             if (theCookies[i-1].indexOf(uname) === 1)
             {
                 let theCookie = theCookies[i-1].split('=');
-                alert(theCookie[0]);
                 let date = new Date(new Date().getTime()-60000);
                 document.cookie = theCookie[0]+"=id; path=/; expires=" +date.toUTCString();
             }

@@ -261,7 +261,31 @@
 
         function Sale()
         {
+            try
+            {
+                $pdo = Tools::Connect();
+                $ruser = 'cart';
+                if (isset($_SESSION['reg']) && $_SESSION['reg'] != "")
+                {
+                    $ruser = $_SESSION['reg'];
+                }
+                $sql = "update customer set total=total + ? where login = ?";
+                $ps = $pdo->prepare($sql);
+                $ps->execute(array($this->price_sale, $ruser));
 
+                $ins = "insert into sales(customer_name, item_name, price_in, price_sale, date_sale) values(?,?,?,?,?)";
+                $ps = $pdo->prepare($ins);
+                $ps->execute(array($ruser, $this->item_name, $this->price_in, $this->price_sale, @date("Y/m/d H:i:s")));
+
+                $del = "delete from items where id = ?";
+                $ps = $pdo->prepare($del);
+                $ps->execute(array($this->id));
+            }
+            catch (PDOException $ex)
+            {
+                echo $ex->getMessage();
+                return false;
+            }
         }
     }
 
